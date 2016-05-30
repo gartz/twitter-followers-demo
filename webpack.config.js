@@ -11,8 +11,27 @@ module.exports = {
     filename: '[name].js'
   },
   module: {
+    preLoaders: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader'
+      }
+    ],
     loaders: [
-      { test: /\.css$/, loader: 'style!css' }
+      {
+        test: /\.css$/,
+        loader: 'style!css'
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel',
+        query: {
+          cacheDirectory: true,
+          presets: ['es2015']
+        }
+      }
     ]
   },
   plugins: [
