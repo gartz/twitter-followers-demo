@@ -1,0 +1,26 @@
+.tile {
+    position: relative;
+    display: block;
+    background-color: #ddffdd;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.tile:hover {
+    background-color: #88aa88;
+}
+
+.tile.selected {
+    background-color: #88dd88;
+}
+
+.tile > .count {
+    font-size: .8em;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: lightgreen;
+    border-radius: 30px;
+    padding: 2px 6px;
+}

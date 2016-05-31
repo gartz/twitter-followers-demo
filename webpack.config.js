@@ -20,6 +20,10 @@ module.exports = {
     ],
     loaders: [
       {
+        test: /\.html$/,
+        loader: 'html'
+      },
+      {
         test: /\.css$/,
         loader: 'style!css'
       },
@@ -38,5 +42,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: pkg.name
     })
-  ]
+  ],
+  debug: true,
+  devtool: 'inline-source-map'
 };

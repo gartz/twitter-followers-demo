@@ -1,0 +1,8 @@
+.user-list {
+    display: flex;
+}
+
+.user-list-item {
+    display: inline-block;
+    padding-right: 10px;
+}
