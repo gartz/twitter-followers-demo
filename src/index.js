@@ -9,6 +9,17 @@ import $ from 'jquery';
 
 const settingsModel = new SettingsModel();
 
+const router = new PushStateTree({
+  usePushState: true
+});
+
+const updateUrl = () => {
+  let names = userListView.collection.pluck('screen_name');
+  let uri = names.join('/');
+  if (uri === router.uri) return;
+  router.pushState(null, null, '/' + uri);
+};
+
 // Container with user lists
 const userListView = new UserListView({
   View: Backbone.View.extend({
@@ -29,6 +40,7 @@ const userListView = new UserListView({
         let index = userListView.collection.findIndex(model => model.get('followers') === userTiles.collection);
         if (index === -1) {
           userListView.collection.add({screen_name});
+          updateUrl();
           return;
         }
 
@@ -42,14 +54,14 @@ const userListView = new UserListView({
           userListView.collection.remove(removeList);
           userListView.collection.add({screen_name});
         }
+        updateUrl();
       });
     }
   })
 });
 
-const router = new PushStateTree({
-  usePushState: true
-});
+userListView.render();
+userListView.$el.appendTo('body');
 
 const route = router.createRule({
   id: 'selector',
@@ -67,11 +79,32 @@ $(route).on('match', function () {
   }
 
   let usersNav = this.uri.split('/');
-  userListView.render();
-  userListView.$el.appendTo('body');
 
   // Initial value
-  usersNav.forEach(screen_name => {
+  usersNav.forEach((screen_name, index) => {
+    let modelFromIndex = userListView.collection.at(index);
+
+    if (!modelFromIndex) {
+      userListView.collection.add({screen_name: screen_name});
+      return;
+    }
+
+    // Skip if there were no changes
+    if (modelFromIndex.get('screen_name').toLocaleLowerCase() === screen_name.toLocaleLowerCase()) return;
+
+    let removeList = userListView.collection.slice(index + 1);
+    userListView.collection.remove(removeList);
     userListView.collection.add({screen_name: screen_name});
   });
+
+  if (userListView.collection.length > usersNav.length) {
+    let unselectModel = userListView.collection.at(usersNav.length - 1);
+    if (unselectModel) {
+      let selectedFollower = unselectModel.get('followers').findWhere({selected: true});
+      if (selectedFollower) selectedFollower.set('selected', false);
+    }
+
+    let removeList = userListView.collection.slice(usersNav.length);
+    userListView.collection.remove(removeList);
+  }
 }).appendTo(router);

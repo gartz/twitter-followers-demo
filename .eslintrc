@@ -25,7 +25,7 @@
     "strict": "off",
     "consistent-return": "off",
     "valid-jsdoc": "off",
-    "no-console": "warn",
+    "no-console": "off",
     "max-len": ["warn", {
       "code": 120,
       "tabWidth": 2,
