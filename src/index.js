@@ -9,17 +9,6 @@ import $ from 'jquery';
 
 const settingsModel = new SettingsModel();
 
-const router = new PushStateTree({
-  usePushState: true
-});
-
-const updateUrl = () => {
-  let names = userListView.collection.pluck('screen_name');
-  let uri = names.join('/');
-  if (uri === router.uri) return;
-  router.pushState(null, null, '/' + uri);
-};
-
 // Container with user lists
 const userListView = new UserListView({
   View: Backbone.View.extend({
@@ -60,6 +49,17 @@ const userListView = new UserListView({
   })
 });
 
+const router = new PushStateTree({
+  usePushState: true
+});
+
+function updateUrl() {
+  let names = userListView.collection.pluck('screen_name');
+  let uri = names.join('/');
+  if (uri === router.uri) return;
+  router.pushState(null, null, '/' + uri);
+}
+
 userListView.render();
 userListView.$el.appendTo('body');
 
@@ -92,7 +92,7 @@ $(route).on('match', function () {
     // Skip if there were no changes
     if (modelFromIndex.get('screen_name').toLocaleLowerCase() === screen_name.toLocaleLowerCase()) return;
 
-    let removeList = userListView.collection.slice(index + 1);
+    let removeList = userListView.collection.slice(index);
     userListView.collection.remove(removeList);
     userListView.collection.add({screen_name: screen_name});
   });

@@ -33,17 +33,28 @@ export const FollowersModel = Backbone.Model.extend({
 export const FollowersCollection = Backbone.Collection.extend({
   model: FollowersModel,
   sync: () => {},
-  initialize() {
-    this.on('add', model => {
-      let index = this.length - 2;
-      if (index < 0) return;
 
-      let previousModel = this.at(index);
-      let screen_name = model.get('screen_name').toLocaleLowerCase();
-      previousModel.get('followers').on('add', selectModel => {
-        if (selectModel.get('screen_name').toLocaleLowerCase() === screen_name) {
-          selectModel.set('selected', true);
-        }
+
+  initialize() {
+    this.on('update', () => {
+      this.forEach((model, index) => {
+        let previousModel = this.at(index - 1);
+        if (!previousModel) return;
+
+        let screen_name = model.get('screen_name').toLocaleLowerCase();
+        let followers = previousModel.get('followers');
+
+        if (followers._oldSelectListener) followers.off('add', followers._oldSelectListener);
+        followers._oldSelectListener = selectModel => {
+          if (selectModel.get('screen_name').toLocaleLowerCase() === screen_name) {
+            let oldSelected = followers.findWhere({selected: true});
+            if (oldSelected) oldSelected.set('selected', false);
+            selectModel.set('selected', true);
+            return true;
+          }
+        };
+        followers.on('add', followers._oldSelectListener);
+        followers.find(followers._oldSelectListener);
       });
     });
   }
