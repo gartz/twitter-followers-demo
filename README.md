@@ -14,6 +14,7 @@ You need to setup the follow env vars:
 Then you will be able to run:
 
 ```bash
+npm install
 npm start
 ```
 
