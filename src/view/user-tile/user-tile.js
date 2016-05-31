@@ -20,12 +20,19 @@ export const UserTile = Backbone.View.extend({
     this.setElement(template);
 
     let binder = new ModelBinder();
+    this.modelBinder = binder;
 
     binder.bind(this.model, this.el);
 
     this.model.on('change:selected', model => {
       this.$el.toggleClass('selected', !!model.get('selected'));
     });
+
+    return this;
+  },
+
+  close() {
+    this.modelBinder.unbind();
   }
 });
 

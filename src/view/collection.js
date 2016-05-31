@@ -33,6 +33,12 @@ export const UserList = Backbone.View.extend({
     this.collectionBinder = collectionBinder;
 
     this.on('child:click', this.select);
+
+    return this;
+  },
+
+  close() {
+    this.collectionBinder.unbind();
   }
 });
 

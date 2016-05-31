@@ -22,11 +22,21 @@ const userListView = new UserListView({
         let screen_name = view.model.get('screen_name');
 
         let index = userListView.collection.findIndex(model => model.get('followers') === userTiles.collection);
+        if (index === -1) {
+          userListView.collection.add({screen_name});
+          return;
+        }
 
-        let removeList = userListView.collection.slice(index + 1);
-        userListView.collection.remove(removeList);
-
-        userListView.collection.add({screen_name});
+        let nextModel = userListView.collection.at(index + 1);
+        let removeList;
+        if (nextModel && nextModel.get('screen_name') === screen_name) {
+          removeList = userListView.collection.slice(index + 2);
+          userListView.collection.remove(removeList);
+        } else {
+          removeList = userListView.collection.slice(index + 1);
+          userListView.collection.remove(removeList);
+          userListView.collection.add({screen_name});
+        }
       });
     }
   })
