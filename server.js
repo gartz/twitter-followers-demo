@@ -3,9 +3,8 @@ const WebpackDevServer = require('webpack-dev-server');
 const webpack = require('webpack');
 const webpackConfig = require('./webpack.config');
 const tweetserver = require('tweetserver/lib/app');
-const proxy = require('express-http-proxy');
-const url = require('url');
 
+webpackConfig.entry.unshift('webpack-dev-server/client?http://localhost:8000/');
 var compiler = webpack(webpackConfig);
 var server = new WebpackDevServer(compiler, {
   // webpack-dev-server options
@@ -13,7 +12,7 @@ var server = new WebpackDevServer(compiler, {
   contentBase: webpackConfig.output.path,
 
   hot: true,
-  historyApiFallback: false,
+  historyApiFallback: true,
   compress: false,
 
   // webpack-dev-middleware options
@@ -25,12 +24,16 @@ var server = new WebpackDevServer(compiler, {
     aggregateTimeout: 300,
     poll: 1000
   },
-  stats: { colors: true }
+  stats: { colors: true },
+  proxy: {
+    '/api/*': {
+      target: 'http://localhost:8001',
+      rewrite: function(req) {
+        req.url = req.url.replace(/^\/api/, '');
+      }
+    }
+  }
 });
-
-server.use('/api', proxy('localhost:8001', {
-  forwardPath: (req, res) => url.parse(req.url).path
-}));
 
 server.listen(8000, 'localhost', () => {});
 tweetserver({

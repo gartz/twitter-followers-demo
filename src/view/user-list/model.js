@@ -20,7 +20,8 @@ export const FollowersModel = Backbone.Model.extend({
   updateContent() {
     let screen_name = this.get('screen_name') || '';
 
-    this.get('followers').fetch({
+    let collection = this.get('followers');
+    collection.fetch({
       data: {
         screen_name,
         count: 200
@@ -31,5 +32,19 @@ export const FollowersModel = Backbone.Model.extend({
 
 export const FollowersCollection = Backbone.Collection.extend({
   model: FollowersModel,
-  sync: () => {}
+  sync: () => {},
+  initialize() {
+    this.on('add', model => {
+      let index = this.length - 2;
+      if (index < 0) return;
+
+      let previousModel = this.at(index);
+      let screen_name = model.get('screen_name').toLocaleLowerCase();
+      previousModel.get('followers').on('add', selectModel => {
+        if (selectModel.get('screen_name').toLocaleLowerCase() === screen_name) {
+          selectModel.set('selected', true);
+        }
+      });
+    });
+  }
 });

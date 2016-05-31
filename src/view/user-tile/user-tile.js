@@ -27,6 +27,7 @@ export const UserTile = Backbone.View.extend({
     this.model.on('change:selected', model => {
       this.$el.toggleClass('selected', !!model.get('selected'));
     });
+    this.$el.toggleClass('selected', !!this.model.get('selected'));
 
     return this;
   },
